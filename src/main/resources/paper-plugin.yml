@@ -11,5 +11,8 @@ description: Affiche des images sur des cartes Minecraft, avec chargement asynch
 
 permissions:
   imagemaps.admin:
-    description: Autorise la gestion des cartes-images.
+    description: Autorise la gestion des cartes-images (suppression, cache, reload, liste).
     default: op
+  imagemaps.create:
+    description: Autorise la création de cartes-images.
+    default: true

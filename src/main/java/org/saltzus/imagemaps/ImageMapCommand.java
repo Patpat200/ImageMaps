@@ -31,12 +31,18 @@ public class ImageMapCommand implements BasicCommand {
         CommandSender sender = stack.getSender();
 
         if (args.length == 0) {
-            sender.sendMessage("§7Usage: /imagemap <create <url>|reload|remove <id>|clearcache [id]|list>");
+            sender.sendMessage("§7Usage: /imagemap create <url>"
+                    + (sender.hasPermission("imagemaps.admin")
+                        ? "  §7(admin: reload|remove <id>|clearcache [id]|list)" : ""));
             return;
         }
 
         switch (args[0].toLowerCase()) {
             case "create" -> {
+                if (!sender.hasPermission("imagemaps.create")) {
+                    sender.sendMessage("§cTu n'as pas la permission de créer une carte-image.");
+                    return;
+                }
                 if (!(sender instanceof Player player)) {
                     sender.sendMessage("§cSeul un joueur peut recevoir une carte.");
                     return;
@@ -64,10 +70,18 @@ public class ImageMapCommand implements BasicCommand {
                 sender.sendMessage("§aCarte-image créée avec l'id §f#" + id + "§a : " + url);
             }
             case "reload" -> {
+                if (!sender.hasPermission("imagemaps.admin")) {
+                    sender.sendMessage("§cTu n'as pas la permission de faire ça.");
+                    return;
+                }
                 plugin.getImageConfig().load();
                 sender.sendMessage("§adata.yml rechargé (" + plugin.getImageConfig().all().size() + " image(s)).");
             }
             case "remove" -> {
+                if (!sender.hasPermission("imagemaps.admin")) {
+                    sender.sendMessage("§cTu n'as pas la permission de supprimer une carte-image.");
+                    return;
+                }
                 if (args.length < 2) {
                     sender.sendMessage("§cUsage: /imagemap remove <id>");
                     return;
@@ -80,6 +94,10 @@ public class ImageMapCommand implements BasicCommand {
                 sender.sendMessage("§aEntrée #" + id + " supprimée.");
             }
             case "clearcache" -> {
+                if (!sender.hasPermission("imagemaps.admin")) {
+                    sender.sendMessage("§cTu n'as pas la permission de faire ça.");
+                    return;
+                }
                 if (args.length >= 2) {
                     int id = parseIdOrWarn(sender, args[1]);
                     if (id < 0) return;
@@ -92,19 +110,24 @@ public class ImageMapCommand implements BasicCommand {
                 }
             }
             case "list" -> {
+                if (!sender.hasPermission("imagemaps.admin")) {
+                    sender.sendMessage("§cTu n'as pas la permission de faire ça.");
+                    return;
+                }
                 sender.sendMessage("§7--- Cartes-images (" + plugin.getImageConfig().all().size() + ") ---");
                 for (Map.Entry<Integer, String> e : plugin.getImageConfig().all().entrySet()) {
                     sender.sendMessage("§f#" + e.getKey() + " §7-> " + e.getValue());
                 }
             }
-            default -> sender.sendMessage("§7Usage: /imagemap <create <url>|reload|remove <id>|clearcache [id]|list>");
+            default -> sender.sendMessage("§7Usage: /imagemap create <url>");
         }
     }
 
-    @Override
-    public @NotNull String permission() {
-        return "imagemaps.admin";
-    }
+    // Pas de permission() surchargée : /imagemap reste visible/exécutable
+    // par tout le monde au niveau de la commande elle-même. Chaque
+    // sous-commande vérifie sa propre permission ci-dessus (création
+    // ouverte à tous via imagemaps.create, gestion réservée aux admins
+    // via imagemaps.admin).
 
     private int parseIdOrWarn(CommandSender sender, String raw) {
         try {

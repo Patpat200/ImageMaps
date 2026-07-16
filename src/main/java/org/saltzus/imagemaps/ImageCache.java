@@ -134,21 +134,31 @@ public final class ImageCache {
 
         // 2) Résolution + téléchargement réseau.
         try {
-            String directUrl = ImageResolver.resolveDirectUrl(rawUrl);
-            byte[] bytes = ImageResolver.download(directUrl);
+            byte[] bytes = ImageResolver.resolveAndDownload(rawUrl);
             BufferedImage raw = ImageIO.read(new ByteArrayInputStream(bytes));
             if (raw == null) {
-                throw new IOException("Les données téléchargées ne sont pas une image valide (" + directUrl + ")");
+                throw new IOException("Les données téléchargées ne sont pas une image valide (" + rawUrl + ")");
             }
             BufferedImage fitted = fitToMap(raw);
             saveToDisk(diskFile, fitted);
             return fitted;
         } catch (Exception e) {
-            plugin.getLogger().log(Level.WARNING,
-                    "[ImageMaps] Impossible de résoudre/télécharger l'image #" + id + " (" + rawUrl + ") : "
-                            + e.getMessage(), plugin.getLogger().isLoggable(Level.FINE) ? e : null);
+            plugin.getLogger().warning("[ImageMaps] Impossible de résoudre/télécharger l'image #" + id
+                    + " (" + rawUrl + ") : " + describe(e));
             return null;
         }
+    }
+
+    /** Concatène le message de l'exception et de toute sa chaîne de causes, pour un log utile sans activer FINE. */
+    private static String describe(Throwable t) {
+        StringBuilder sb = new StringBuilder();
+        Throwable current = t;
+        while (current != null) {
+            if (!sb.isEmpty()) sb.append(" — cause : ");
+            sb.append(current.getMessage() != null ? current.getMessage() : current.getClass().getSimpleName());
+            current = current.getCause();
+        }
+        return sb.toString();
     }
 
     /** Recadre/redimensionne (mode "cover") l'image source en 128x128 pour coller à une carte. */
