@@ -1,5 +1,7 @@
 package org.saltzus.imagemaps;
 
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ImageMapsPlugin extends JavaPlugin {
@@ -20,12 +22,17 @@ public class ImageMapsPlugin extends JavaPlugin {
         this.imageCache = new ImageCache(this);
 
         getServer().getPluginManager().registerEvents(new ImageManager(this), this);
-        var cmd = getCommand("imagemap");
-        if (cmd != null) {
-            cmd.setExecutor(new ImageMapCommand(this));
-        } else {
-            getLogger().warning("Commande 'imagemap' introuvable dans paper-plugin.yml ?");
-        }
+
+        // Les plugins Paper (paper-plugin.yml) enregistrent leurs commandes
+        // via la Lifecycle API plutôt que via la section "commands:" du yml.
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            Commands commands = event.registrar();
+            commands.register(
+                    "imagemap",
+                    "Gère les cartes-images (ImageMaps)",
+                    new ImageMapCommand(this)
+            );
+        });
 
         getLogger().info("[ImageMaps] Activé — " + imageConfig.all().size() + " image(s) configurée(s), chargement en tâche de fond.");
     }
