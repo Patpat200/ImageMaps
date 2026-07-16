@@ -81,18 +81,3 @@ Le jar buildé se trouve dans `target/ImageMaps.jar`.
 4. Copie le `data.yml` corrigé (fourni à côté de ce README) dans
    `plugins/ImageMaps/data.yml`.
 5. Démarre le serveur.
-
-## À propos du data.yml corrigé
-
-- `'56'` et `'64'` : URLs Dropbox malformées, corrigées.
-- `'81'` et `'84'` : résolues manuellement vers leurs liens `i.ibb.co`
-  directs (au lieu de laisser le plugin scraper la page à chaque fois).
-- `'26'`, `'30'`, `'32'`, `'43'`, `'49'`, `'51'` : liens Google (Photos/Drive/
-  miniature de recherche) qui sont soit temporaires, soit nécessitent que le
-  fichier soit partagé publiquement. Ils sont laissés tels quels avec un
-  commentaire dans le fichier — surveille les logs du serveur (`[ImageMaps]`)
-  pour voir s'ils échouent, et remplace-les par un hébergement plus stable
-  (ibb.co, imgur direct) si besoin.
-- Toutes les autres images (Pinterest, ibb.co, Dropbox bien formés,
-  cataas, modrinth...) sont inchangées : le nouveau plugin les gère
-  nativement, y compris les pages qui ne sont pas des liens d'image directs.
