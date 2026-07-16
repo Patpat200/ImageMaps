@@ -5,11 +5,9 @@ api-version: '26.2'
 author: saltzus
 description: Affiche des images sur des cartes Minecraft, avec chargement asynchrone, cache disque et résolution automatique des liens (Dropbox, Google Drive, pages avec balise og:image, etc).
 
-commands:
-  imagemap:
-    description: Gère les cartes-images.
-    usage: /imagemap <create|reload|remove|clearcache|list> [args]
-    permission: imagemaps.admin
+# Les plugins Paper (paper-plugin.yml) n'utilisent plus la section
+# "commands:" classique : la commande /imagemap est enregistrée en code
+# via la Lifecycle API (voir ImageMapsPlugin#onEnable).
 
 permissions:
   imagemaps.admin:
